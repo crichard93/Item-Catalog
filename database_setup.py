@@ -18,9 +18,9 @@ class User(Base):
     picture = Column(String(250))
 
 
-#Format for CarType Table
-class CarType(Base):
-    __tablename__ = 'car_type'
+#Format for Brand Table
+class Brand(Base):
+    __tablename__ = 'brand'
    
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -36,17 +36,17 @@ class CarType(Base):
        }
 
 
-#Format for Car Table 
-class Car(Base):
-    __tablename__ = 'car'
+#Format for Model Table 
+class Model(Base):
+    __tablename__ = 'model'
 
 
-    name =Column(String(80), nullable = False)
+    name = Column(String(80), nullable = False)
     id = Column(Integer, primary_key = True)
-    description = Column(String(250))
+    description = Column(String(2000))
     image = Column(String(250))
-    car_type_id = Column(Integer,ForeignKey('car_type.id'))
-    car_type = relationship(CarType)
+    brand_id = Column(Integer,ForeignKey('brand.id'))
+    brand = relationship(Brand)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
