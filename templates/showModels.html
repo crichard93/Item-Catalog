@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+	</head>
+	<body>
+		<div>
+
+			{% for model in models %}
+				<h3>{{model.name}}</h3>
+				<div>
+					{{model.image}}
+				</div>
+			{% endfor %}
+		</div>
+	</body>
+</html>
