@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		
+	</head>
+<body>
+	<div>
+		<h1>Edit {{editModel.name}} Model</h1>
+	</div>
+		<form action="#" method = "post">
+			<div>
+				<label for="name">Name:</label>
+				<input type ="text" maxlength="50" class="form-control" name="name" value="{{editModel.name}}">
+
+				<label for="description">Description:</label>
+				<textarea class="form-control" maxlength="2000" rows="3" cols="50" name="description">{{editModel.description}}</textarea>
+
+
+				<button type="submit" class="btn btn-default" id="submit">
+				<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Update</button>
+			</div>
+		</form>
+		<div class="image">
+			<img src="{{url_for('static',filename=('images/'+editModel.image))}}" alt="Model Image">
+		</div>
+
+</body>
+</html>
