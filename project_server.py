@@ -47,7 +47,6 @@ def showModel(brand_id, model_id):
 
 #Edit Model in Brand, first show form, then edit and update database with form data
 @app.route('/brands/<int:brand_id>/<int:model_id>/edit/',methods = ('GET', 'POST'))
-@app.route('/brands/<int:brand_id>/<int:model_id>/edit/#',methods = ('GET', 'POST'))
 def editModel(brand_id, model_id):
     brand = session.query(Brand).filter_by(id = brand_id).one()
     editModel = session.query(Model).filter_by(id = model_id).one()
@@ -63,11 +62,16 @@ def editModel(brand_id, model_id):
         return render_template('editModel.html', brand = brand, editModel = editModel)
 
 #Delete Model from Brand
-@app.route('/brands/<int:brand_id>/<int:model_id>/delete/')
+@app.route('/brands/<int:brand_id>/<int:model_id>/delete/', methods = ('GET', 'POST'))
 def deleteModel(brand_id, model_id):
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
-    return render_template('deleteModel.html', brand = brand, model = model)
+    if request.method == 'POST':
+        session.delete(model)
+        session.commit()
+        return redirect(url_for('showModels', brand_id = brand_id))
+    else:
+        return render_template('deleteModel.html', brand = brand, model = model, brand_id=brand_id)
 
 #Add Model to Brand. First show the input form, then update database with form data from user
 @app.route('/brands/<int:brand_id>/add/', methods = ('GET', 'POST'))
