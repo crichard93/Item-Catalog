@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		
-	</head>
-	<body>
-		<div>
-
+{% extends "main.html" %}
+{% block content %}
+		<div class="row">
 			{% for model in models %}
-				<h3>{{model.name}}</h3>
-				<div>
-					{{model.image}}
-				</div>
+			<div class="col-sm-3 col-md-4 col-lg-4">
+				<a href="{{url_for('showModel',brand_id=brand.id, model_id=model.id)}}">
+					<h3>{{model.name}}</h3>
+				</a>
+				
+			</div>
+			<div class="col-sm-9 col-md-8 col-lg-5 mx-auto image">
+				<a href="{{url_for('showModel',brand_id=brand.id, model_id=model.id)}}">
+					<img class="img-fluid" src="{{url_for('static',filename=('images/'+model.image))}}" alt="Model Image">					
+				</a>				
+
+			</div>
 			{% endfor %}
 		</div>
-	</body>
-</html>
+{% endblock %}
