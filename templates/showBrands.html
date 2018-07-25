@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		
-	</head>
-	<body>
-		<div>
-
-			{% for brand in brands %}
-				<h3>{{brand.name}}</h3>
-			{% endfor %}
+{% extends "main.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-6">
+			<h1>Car Catalog Application</h1>
 		</div>
-	</body>
-</html>
+		<div class="col-3 offset-3">
+			{% if 'username' not in login_session %}
+				<a href="{{url_for('showLogin')}}">
+					<button type="button" class=" btn btn-success">Login</button>
+				</a>
+			{% else %}
+				<a href="{{url_for('disconnect')}}">
+					<button type="button" class=" btn btn-danger">Logout</button>
+				</a>
+			{% endif %}
+		</div>
 
+	</div>
+	<div class="row">
+		{% for brand in brands %}
+		<div class="col-12">
+			<a href="{{url_for('showModels',brand_id=brand.id)}}">
+				<h3>{{brand.name}}</h3>
+			</a>
+		</div>
+		{% endfor %}
+	</div>
+	</body>
+{% endblock %}

@@ -22,7 +22,6 @@ APPLICATION_NAME = "Item Catalog Application"
 # Connect to Database and create database session
 engine = create_engine('sqlite:///cars.db?check_same_thread=False')
 Base.metadata.bind = engine
-
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
@@ -31,29 +30,42 @@ session = DBSession()
 @app.route('/')
 @app.route('/brands/')
 def showBrands():
+    #Retrieve brands object from URL  
     brands = session.query(Brand).order_by(asc(Brand.name))
-    return render_template('showBrands.html', brands = brands)
+    return render_template('showBrands.html', brands = brands, login_session = login_session)
 
 
 #Display all Models in brand with options to add Models
 @app.route('/brands/<int:brand_id>/')
 def showModels(brand_id):
+    #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     models = session.query(Model).filter_by(brand_id = brand_id)
-    return render_template('showModels.html', brand = brand, models = models)
+    return render_template('showModels.html', brand = brand, models = models, login_session = login_session)
+
 
 #Display description + image of Model in a Brand with option to Edit or delete
 @app.route('/brands/<int:brand_id>/<int:model_id>/')
 def showModel(brand_id, model_id):
+    #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
-    return render_template('showModel.html', brand = brand, model = model)
+    return render_template('showModel.html', brand = brand, model = model, login_session = login_session)
+
 
 #Edit Model in Brand, first show form, then edit and update database with form data
 @app.route('/brands/<int:brand_id>/<int:model_id>/edit/',methods = ('GET', 'POST'))
 def editModel(brand_id, model_id):
+    #Check login status, redirect to login if not logged in
+    if 'username' not in login_session:
+        return redirect('/login')
+    #Retrieve brand and model objects from URL    
     brand = session.query(Brand).filter_by(id = brand_id).one()
     editModel = session.query(Model).filter_by(id = model_id).one()
+    #Check user authority to edit item
+    if login_session['user_id'] != editModel.user_id:
+        flash('You do not have permission to edit this model.')
+        return redirect(url_for('showModels', brand_id = brand_id))
     if request.method == 'POST':
         if request.form['name']:
             editModel.name = request.form['name']
@@ -65,11 +77,17 @@ def editModel(brand_id, model_id):
     else:
         return render_template('editModel.html', brand = brand, editModel = editModel)
 
+
 #Delete Model from Brand
 @app.route('/brands/<int:brand_id>/<int:model_id>/delete/', methods = ('GET', 'POST'))
 def deleteModel(brand_id, model_id):
+    #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
+    #Check user authority to edit item
+    if login_session['user_id'] != model.user_id:
+        flash('You do not have permission to delete this model.')
+        return redirect(url_for('showModels', brand_id = brand_id))
     if request.method == 'POST':
         session.delete(model)
         session.commit()
@@ -77,9 +95,14 @@ def deleteModel(brand_id, model_id):
     else:
         return render_template('deleteModel.html', brand = brand, model = model, brand_id=brand_id)
 
+
 #Add Model to Brand. First show the input form, then update database with form data from user
 @app.route('/brands/<int:brand_id>/add/', methods = ('GET', 'POST'))
 def addModel(brand_id):
+    #Check login status, redirect to login if not logged in
+    if 'username' not in login_session:
+        return redirect('/login')
+    #Retrieve brand objects from URL          
     brand = session.query(Brand).filter_by(id = brand_id).one()
     if request.method == 'POST':
         newModel = Model(name = request.form['name'], description = request.form['description'], brand_id = brand_id, user_id = brand.user_id)
@@ -90,7 +113,8 @@ def addModel(brand_id):
     else:
         return render_template('addModel.html', brand = brand)
 
-# Create anti-forgery state token
+
+# Create randomly generated state token and store in login_session object
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -100,7 +124,7 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-#Login to Google
+#Login to Google, modified from Udacity provided example
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -172,8 +196,6 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-    # ADD PROVIDER TO LOGIN SESSION
-    login_session['provider'] = 'google'
 
     # see if user exists, if it doesn't make a new one
     user_id = getUserID(data["email"])
@@ -192,9 +214,8 @@ def gconnect():
     print "done!"
     return output
 
-# User Helper Functions
 
-
+# User Helper Functions, modified from Udacity-provided example
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -216,7 +237,8 @@ def getUserID(email):
     except:
         return None
 
-# DISCONNECT - Revoke a current user's token and reset their login_session
+
+# DISCONNECT - Revoke a current user's token and reset their login_session, modified from Udacity-provided example
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -239,10 +261,11 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-# Disconnect by deleting login_session details
+
+# Disconnect by deleting login_session details, modified from Udacity-provided example
 @app.route('/disconnect')
 def disconnect():
-    if 'provider' in login_session:
+    if 'gplus_id' in login_session:
         gdisconnect()
         del login_session['gplus_id']
         del login_session['access_token']
@@ -250,7 +273,6 @@ def disconnect():
         del login_session['email']
         del login_session['picture']
         del login_session['user_id']
-        del login_session['provider']
         flash("You have successfully been logged out.")
         return redirect(url_for('showBrands'))
     else:
@@ -261,6 +283,6 @@ def disconnect():
 
 
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
+    app.secret_key = '123youwi11neve4eve4hackthi5key'
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)
