@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		
-	</head>
-	<body>
-		<h2> Delete {{brand.name}} {{model.name}}?</h2>
+{% extends "main.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col">
+			<h2>Delete {{brand.name}} {{model.name}}?</h2>
+		</div>
+	</div>
 
-		<form action="#" method = 'post'>
+	<form class="form-horizontal" action="#" method = 'post'>
+		<div class="form-group row">
+			<div class="form-group col">
+				<button type="submit" class="btn btn-warning delete" id="submit" type="submit">Delete</button>				
+				<a href='{{ url_for('showModel', brand_id = brand_id, model_id=model.id, login_session=login_session) }}'>
+					<button class="btn btn-danger delete">Cancel</button>
+				</a>
+			</div>
+		</div>
+	</form>
+{% endblock %}
 
-			<button type="submit" class="btn btn-default delete" id="submit" type="submit">
-			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</button>
-		</form>			
-			<a href='{{url_for('showModels', brand_id = brand_id)}}'>
-				<button class="btn btn-default delete">
-				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
-			</a>
-	</body>
-</html>

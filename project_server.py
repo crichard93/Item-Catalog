@@ -81,10 +81,13 @@ def editModel(brand_id, model_id):
 #Delete Model from Brand
 @app.route('/brands/<int:brand_id>/<int:model_id>/delete/', methods = ('GET', 'POST'))
 def deleteModel(brand_id, model_id):
+    #Check login status, redirect to login if not logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
-    #Check user authority to edit item
+    #Check user authority to delete item
     if login_session['user_id'] != model.user_id:
         flash('You do not have permission to delete this model.')
         return redirect(url_for('showModels', brand_id = brand_id))
