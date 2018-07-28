@@ -5,16 +5,15 @@
 			<h2>Delete {{brand.name}} {{model.name}}?</h2>
 		</div>
 	</div>
-
-	<form class="form-horizontal" action="#" method = 'post'>
-		<div class="form-group row">
-			<div class="form-group col">
-				<button type="submit" class="btn btn-warning delete" id="submit" type="submit">Delete</button>				
-				<a href='{{ url_for('showModel', brand_id = brand_id, model_id=model.id, login_session=login_session) }}'>
-					<button class="btn btn-danger delete">Cancel</button>
-				</a>
+		<form class="form" action="#" method = 'post'>
+			<div class="form-group row">
+				<div class="form-group col">
+					<button type="submit" class="btn btn-warning delete" id="submit" type="submit">Delete</button>				
+					<a href="{{ url_for('showModel', brand_id = brand_id, model_id=model.id, login_session=login_session) }}">
+						<button type="button" class="btn btn-danger   delete">Cancel</button>
+					</a>
+				</div>
 			</div>
-		</div>
-	</form>
+		</form>
 {% endblock %}
 
