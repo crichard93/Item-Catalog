@@ -41,7 +41,9 @@ def showModels(brand_id):
     #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     models = session.query(Model).filter_by(brand_id = brand_id)
-    return render_template('showModels.html', brand = brand, models = models, login_session = login_session)
+    #Query brands for navbar
+    brands = session.query(Brand).order_by(asc(Brand.name))
+    return render_template('showModels.html', brand = brand, models = models, login_session = login_session, brands = brands)
 
 
 #Display description + image of Model in a Brand with option to Edit or delete
@@ -50,7 +52,9 @@ def showModel(brand_id, model_id):
     #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
-    return render_template('showModel.html', brand = brand, model = model, login_session = login_session)
+    #Query brands for navbar
+    brands = session.query(Brand).order_by(asc(Brand.name))
+    return render_template('showModel.html', brand = brand, model = model, login_session = login_session, brands = brands)
 
 
 #Edit Model in Brand, first show form, then edit and update database with form data
@@ -62,6 +66,8 @@ def editModel(brand_id, model_id):
     #Retrieve brand and model objects from URL    
     brand = session.query(Brand).filter_by(id = brand_id).one()
     editModel = session.query(Model).filter_by(id = model_id).one()
+    #Query brands for navbar
+    brands = session.query(Brand).order_by(asc(Brand.name))
     #Check user authority to edit item
     if login_session['user_id'] != editModel.user_id:
         flash('You do not have permission to edit this model.')
@@ -73,9 +79,9 @@ def editModel(brand_id, model_id):
             editModel.description = request.form['description']
         session.add(editModel)
         session.commit
-        return redirect(url_for('showModel', brand_id = brand_id, model_id = model_id))
+        return redirect(url_for('showModel', brand_id = brand_id, model_id = model_id, brands = brands, login_session = login_session))
     else:
-        return render_template('editModel.html', brand = brand, editModel = editModel)
+        return render_template('editModel.html', brand = brand, editModel = editModel, brands = brands, login_session = login_session)
 
 
 #Delete Model from Brand
@@ -87,6 +93,8 @@ def deleteModel(brand_id, model_id):
     #Retrieve brand and model objects from URL  
     brand = session.query(Brand).filter_by(id = brand_id).one()
     model = session.query(Model).filter_by(id = model_id).one()
+    #Query brands for navbar
+    brands = session.query(Brand).order_by(asc(Brand.name))
     #Check user authority to delete item
     if login_session['user_id'] != model.user_id:
         flash('You do not have permission to delete this model.')
@@ -94,9 +102,9 @@ def deleteModel(brand_id, model_id):
     if request.method == 'POST':
         session.delete(model)
         session.commit()
-        return redirect(url_for('showModels', brand_id = brand_id))
+        return redirect(url_for('showModels', brand_id = brand_id, brands = brands, login_session=login_session))
     else:
-        return render_template('deleteModel.html', brand = brand, model = model, brand_id=brand_id)
+        return render_template('deleteModel.html', brand = brand, model = model, brands = brands, brand_id=brand_id, login_session = login_session)
 
 
 #Add Model to Brand. First show the input form, then update database with form data from user
@@ -107,14 +115,16 @@ def addModel(brand_id):
         return redirect('/login')
     #Retrieve brand objects from URL          
     brand = session.query(Brand).filter_by(id = brand_id).one()
+    #Query brands for navbar
+    brands = session.query(Brand).order_by(asc(Brand.name))
     if request.method == 'POST':
         newModel = Model(name = request.form['name'], description = request.form['description'], brand_id = brand_id, user_id = brand.user_id)
         session.add(newModel)
         session.commit()
         flash('New Model %s Successfully Created' % (newModel.name))
-        return redirect(url_for('showModels', brand_id=brand_id))
+        return redirect(url_for('showModels', brand_id=brand_id, brands = brands, login_session = login_session))
     else:
-        return render_template('addModel.html', brand = brand)
+        return render_template('addModel.html', brand = brand, brands = brands, login_session = login_session)
 
 
 # Create randomly generated state token and store in login_session object

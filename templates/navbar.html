@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+{% block content %}
+  <div class="row">
+    {% for brand in brands %}
+    <div class="col">
+      <a href="{{ url_for('showModels', brand_id = brand.id, login_session = login_session) }}"><h5>{{ brand.name }}</h5>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}

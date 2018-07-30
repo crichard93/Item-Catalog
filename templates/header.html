@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% block content %}
+  <div class="row">
+    <div class="col-6">
+      <a href="{{ url_for('showBrands', login_session = login_session) }}"><h1>Car Catalog Application</h1>
+      </a>
+    </div>
+    <div class="col-3 offset-3">
+      {% if 'username' not in login_session %}
+        <a href="{{url_for('showLogin')}}">
+          <button type="button" class=" btn btn-success">Login</button>
+        </a>
+      {% else %}
+        <a href="{{url_for('disconnect')}}">
+          <button type="button" class=" btn btn-danger">Logout</button>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
