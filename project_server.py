@@ -11,7 +11,6 @@ import httplib2
 import json
 from flask import make_response
 import requests
-import os
 
 app = Flask(__name__)
 
@@ -118,7 +117,7 @@ def addModel(brand_id):
     #Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
     if request.method == 'POST':
-        newModel = Model(name = request.form['name'], description = request.form['description'], brand_id = brand_id, user_id = brand.user_id)
+        newModel = Model(name = request.form['name'], description = request.form['description'], brand_id = brand_id, user_id = login_session['user_id'])
         session.add(newModel)
         session.commit()
         flash('New Model %s Successfully Created' % (newModel.name))
@@ -127,7 +126,7 @@ def addModel(brand_id):
         return render_template('addModel.html', brand = brand, brands = brands, login_session = login_session)
 
 
-# Create randomly generated state token and store in login_session object
+# Create randomly generated state token and store in login_session object, modified from Udacity-provided example
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)

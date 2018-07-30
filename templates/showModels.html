@@ -11,7 +11,7 @@
 	</div>
 	<div class="row">
 		{% for model in models %}
-		<div class="col-sm-3 col-md-4 col-lg-4">
+		<div class="col-sm-3 col-md-4 col-lg-4 text-center">
 			<a href="{{ url_for('showModel', brand_id = brand.id, model_id = model.id, login_session = login_session) }}">
 				<h3>{{model.name}}</h3>
 			</a>
