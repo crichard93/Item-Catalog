@@ -11,13 +11,13 @@
 	</div>
 	<div class="row">
 		{% for model in models %}
-		<div class="col-sm-3 col-md-4 col-lg-4 text-center">
+		<div class="col-sm-3 col-md-5 col-lg-5 text-center">
 			<a href="{{ url_for('showModel', brand_id = brand.id, model_id = model.id, login_session = login_session) }}">
 				<h3>{{model.name}}</h3>
 			</a>
 			
 		</div>
-		<div class="col-sm-9 col-md-8 col-lg-5 mx-auto">
+		<div class="col-sm-9 col-md-7 col-lg-7 mx-auto">
 			{% if model.image %}				
 				<a href="{{ url_for('showModel',brand_id=brand.id, model_id=model.id, login_session = login_session) }}">
 					<img class="img-fluid" src="{{url_for('static',filename=('images/'+model.image))}}" alt="Model Image">					

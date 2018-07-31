@@ -1,3 +1,4 @@
+"""This file runs the server for the project"""
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -292,7 +293,17 @@ def disconnect():
         return redirect(url_for('showBrands'))
 
 
+# JSON Endpoints 
+@app.route('/brands/<int:brand_id>/JSON')
+def showModelsJSON(brand_id):
+    models = session.query(Model).filter_by(brand_id = brand_id).all()
+    return jsonify(Models = [model.serialize for model in models])
 
+
+@app.route('/brands/JSON')
+def showBrandsJSON():
+    brands = session.query(Brand).all()
+    return jsonify(Brands = [brand.serialize for brand in brands])
 
 if __name__ == '__main__':
     app.secret_key = '123youwi11neve4eve4hackthi5key'

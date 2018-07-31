@@ -11,7 +11,6 @@ Base = declarative_base()
 #Format for User table
 class User(Base):
     __tablename__ ='user'
-
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
@@ -20,8 +19,7 @@ class User(Base):
 
 #Format for Brand Table
 class Brand(Base):
-    __tablename__ = 'brand'
-   
+    __tablename__ = 'brand'   
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -31,16 +29,14 @@ class Brand(Base):
     @property
     def serialize(self):
        return {
-           'name'         : self.name,
-           'id'           : self.id,
+       'id'           : self.id,
+       'name'         : self.name
        }
 
 
 #Format for Model Table 
 class Model(Base):
     __tablename__ = 'model'
-
-
     name = Column(String(80), nullable = False)
     id = Column(Integer, primary_key = True)
     description = Column(String(2000))
@@ -55,10 +51,10 @@ class Model(Base):
     @property
     def serialize(self):
        return {
-           'name'         : self.name,
-           'description'  : self.description,
-           'id'           : self.id,
-           'image'        : self.image
+        'id'           : self.id, 
+        'name'         : self.name,
+        'description'  : self.description,
+        'image'        : self.image
        }
 
 

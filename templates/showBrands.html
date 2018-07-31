@@ -3,13 +3,13 @@
 {% include "flash_messages.html" %}
 {% block content %}
 	<div class="row">
-		<div class="col-6">
+		<div class="col-6 offset-6">
 			<h2>Brands</h2>
 		</div>
 	</div>
 	<div class="row">
 		{% for brand in brands %}
-		<div class="col-12">
+		<div class="col-6 offset-6">
 			<a href="{{url_for('showModels', brand_id = brand.id, login_session = login_session) }}">
 				<h3>{{brand.name}}</h3>
 			</a>
