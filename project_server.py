@@ -1,5 +1,6 @@
 """This file runs the server for the project"""
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request,
+from flask import redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Brand, Model, User
@@ -26,52 +27,68 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-#Display All Brands
+# Display All Brands
 @app.route('/')
 @app.route('/brands/')
 def showBrands():
-    #Retrieve brands object from URL  
+    # Retrieve brands object from URL
     brands = session.query(Brand).order_by(asc(Brand.name))
-    return render_template('showBrands.html', brands = brands, login_session = login_session)
+    return render_template(
+                        'showBrands.html',
+                        brands=brands,
+                        login_session=login_session)
 
 
-#Display all Models in brand with options to add Models
+# Display all Models in brand with options to add Models
 @app.route('/brands/<int:brand_id>/')
 def showModels(brand_id):
-    #Retrieve brand and model objects from URL  
-    brand = session.query(Brand).filter_by(id = brand_id).one()
-    models = session.query(Model).filter_by(brand_id = brand_id)
-    #Query brands for navbar
+    # Retrieve brand and model objects from URL
+    brand = session.query(Brand).filter_by(id=brand_id).one()
+    models = session.query(Model).filter_by(brand_id=brand_id)
+    # Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
-    return render_template('showModels.html', brand = brand, models = models, login_session = login_session, brands = brands)
+    return render_template(
+                        'showModels.html',
+                        brand=brand,
+                        models=models,
+                        login_session=login_session,
+                        brands=brands)
 
 
-#Display description + image of Model in a Brand with option to Edit or delete
+# Display description + image of Model in a Brand with option to Edit or delete
 @app.route('/brands/<int:brand_id>/<int:model_id>/')
 def showModel(brand_id, model_id):
-    #Retrieve brand and model objects from URL  
-    brand = session.query(Brand).filter_by(id = brand_id).one()
-    model = session.query(Model).filter_by(id = model_id).one()
-    #Query brands for navbar
+    # Retrieve brand and model objects from URL
+    brand = session.query(Brand).filter_by(id=brand_id).one()
+    model = session.query(Model).filter_by(id=model_id).one()
+    # Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
-    return render_template('showModel.html', brand = brand, model = model, login_session = login_session, brands = brands)
+    return render_template(
+                        'showModel.html',
+                        brand=brand,
+                        model=model,
+                        login_session=login_session,
+                        brands=brands)
 
 
-#Edit Model in Brand, first show form, then edit and update database with form data
-@app.route('/brands/<int:brand_id>/<int:model_id>/edit/',methods = ('GET', 'POST'))
+# Edit Model in Brand, first show form,
+# then edit and update database with form data
+@app.route(
+        '/brands/<int:brand_id>/<int:model_id>/edit/',
+        methods=('GET', 'POST'))
 def editModel(brand_id, model_id):
-    #Check login status, redirect to login if not logged in
+    # Check login status, redirect to login if not logged in
     if 'username' not in login_session:
         return redirect('/login')
-    #Retrieve brand and model objects from URL    
-    brand = session.query(Brand).filter_by(id = brand_id).one()
-    editModel = session.query(Model).filter_by(id = model_id).one()
-    #Query brands for navbar
+    # Retrieve brand and model objects from URL
+    brand = session.query(Brand).filter_by(id=brand_id).one()
+    editModel = session.query(Model).filter_by(id=model_id).one()
+    # Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
-    #Check user authority to edit item
+    # Check user authority to edit item
     if login_session['user_id'] != editModel.user_id:
         flash('You do not have permission to edit this model.')
-        return redirect(url_for('showModels', brand_id = brand_id))
+        return redirect(url_for('showModels', brand_id=brand_id))
     if request.method == 'POST':
         if request.form['name']:
             editModel.name = request.form['name']
@@ -79,55 +96,91 @@ def editModel(brand_id, model_id):
             editModel.description = request.form['description']
         session.add(editModel)
         session.commit
-        return redirect(url_for('showModel', brand_id = brand_id, model_id = model_id, brands = brands, login_session = login_session))
+        return redirect(url_for(
+                            'showModel',
+                            brand_id=brand_id,
+                            model_id=model_id,
+                            brands=brands,
+                            login_session=login_session))
     else:
-        return render_template('editModel.html', brand = brand, editModel = editModel, brands = brands, login_session = login_session)
+        return render_template(
+                            'editModel.html',
+                            brand=brand,
+                            editModel=editModel,
+                            brands=brands,
+                            login_session=login_session)
 
 
-#Delete Model from Brand
-@app.route('/brands/<int:brand_id>/<int:model_id>/delete/', methods = ('GET', 'POST'))
+# Delete Model from Brand
+@app.route(
+        '/brands/<int:brand_id>/<int:model_id>/delete/',
+        methods=('GET', 'POST'))
 def deleteModel(brand_id, model_id):
-    #Check login status, redirect to login if not logged in
+    # Check login status, redirect to login if not logged in
     if 'username' not in login_session:
         return redirect('/login')
-    #Retrieve brand and model objects from URL  
-    brand = session.query(Brand).filter_by(id = brand_id).one()
-    model = session.query(Model).filter_by(id = model_id).one()
-    #Query brands for navbar
+    # Retrieve brand and model objects from URL
+    brand = session.query(Brand).filter_by(id=brand_id).one()
+    model = session.query(Model).filter_by(id=model_id).one()
+    # Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
-    #Check user authority to delete item
+    # Check user authority to delete item
     if login_session['user_id'] != model.user_id:
         flash('You do not have permission to delete this model.')
-        return redirect(url_for('showModels', brand_id = brand_id))
+        return redirect(url_for('showModels', brand_id=brand_id))
     if request.method == 'POST':
         session.delete(model)
         session.commit()
-        return redirect(url_for('showModels', brand_id = brand_id, brands = brands, login_session=login_session))
+        return redirect(url_for(
+                            'showModels',
+                            brand_id=brand_id,
+                            brands=brands,
+                            login_session=login_session))
     else:
-        return render_template('deleteModel.html', brand = brand, model = model, brands = brands, brand_id=brand_id, login_session = login_session)
+        return render_template(
+                                'deleteModel.html',
+                                brand=brand,
+                                model=model,
+                                brands=brands,
+                                brand_id=brand_id,
+                                login_session=login_session)
 
 
-#Add Model to Brand. First show the input form, then update database with form data from user
-@app.route('/brands/<int:brand_id>/add/', methods = ('GET', 'POST'))
+# Add Model to Brand. First show the input form,
+# then update database with form data from user
+@app.route('/brands/<int:brand_id>/add/', methods=('GET', 'POST'))
 def addModel(brand_id):
-    #Check login status, redirect to login if not logged in
+    # Check login status, redirect to login if not logged in
     if 'username' not in login_session:
         return redirect('/login')
-    #Retrieve brand objects from URL          
-    brand = session.query(Brand).filter_by(id = brand_id).one()
-    #Query brands for navbar
+    # Retrieve brand objects from URL
+    brand = session.query(Brand).filter_by(id=brand_id).one()
+    # Query brands for navbar
     brands = session.query(Brand).order_by(asc(Brand.name))
     if request.method == 'POST':
-        newModel = Model(name = request.form['name'], description = request.form['description'], brand_id = brand_id, user_id = login_session['user_id'])
+        newModel = Model(
+                        name=request.form['name'],
+                        description=request.form['description'],
+                        brand_id=brand_id,
+                        user_id=login_session['user_id'])
         session.add(newModel)
         session.commit()
         flash('New Model %s Successfully Created' % (newModel.name))
-        return redirect(url_for('showModels', brand_id=brand_id, brands = brands, login_session = login_session))
+        return redirect(url_for(
+                            'showModels',
+                            brand_id=brand_id,
+                            brands=brands,
+                            login_session=login_session))
     else:
-        return render_template('addModel.html', brand = brand, brands = brands, login_session = login_session)
+        return render_template(
+                            'addModel.html',
+                            brand=brand,
+                            brands=brands,
+                            login_session=login_session)
 
 
-# Create randomly generated state token and store in login_session object, modified from Udacity-provided example
+# Create randomly generated state token and store in login_session object,
+# modified from Udacity-provided example
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -137,7 +190,7 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-#Login to Google, modified from Udacity provided example
+# Login to Google, modified from Udacity provided example
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -190,8 +243,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('Current user is already connected.'), 200)  # noqa
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -222,7 +274,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '  # noqa
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -230,8 +282,10 @@ def gconnect():
 
 # User Helper Functions, modified from Udacity-provided example
 def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+    newUser = User(
+                name=login_session['username'],
+                email=login_session['email'],
+                picture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -251,7 +305,8 @@ def getUserID(email):
         return None
 
 
-# DISCONNECT - Revoke a current user's token and reset their login_session, modified from Udacity-provided example
+# DISCONNECT - Revoke a current user's token and reset their login_session,
+# modified from Udacity-provided example
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -261,21 +316,23 @@ def gdisconnect():
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    #Peform HTTP GET request to revoke token
+    # Peform HTTP GET request to revoke token
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response = make_response(json.dumps('Successfully disconnected.'), 200)  # noqa
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps(
+                                        'Failed to revoke token.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
 
-# Disconnect by deleting login_session details, modified from Udacity-provided example
+# Disconnect by deleting login_session details,
+# modified from Udacity-provided example
 @app.route('/disconnect')
 def disconnect():
     if 'gplus_id' in login_session:
@@ -293,17 +350,17 @@ def disconnect():
         return redirect(url_for('showBrands'))
 
 
-# JSON Endpoints 
+# JSON Endpoints
 @app.route('/brands/<int:brand_id>/JSON')
 def showModelsJSON(brand_id):
-    models = session.query(Model).filter_by(brand_id = brand_id).all()
-    return jsonify(Models = [model.serialize for model in models])
+    models = session.query(Model).filter_by(brand_id=brand_id).all()
+    return jsonify(Models=[model.serialize for model in models])
 
 
 @app.route('/brands/JSON')
 def showBrandsJSON():
     brands = session.query(Brand).all()
-    return jsonify(Brands = [brand.serialize for brand in brands])
+    return jsonify(Brands=[brand.serialize for brand in brands])
 
 if __name__ == '__main__':
     app.secret_key = '123youwi11neve4eve4hackthi5key'
