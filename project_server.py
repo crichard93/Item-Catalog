@@ -36,7 +36,8 @@ def showBrands():
     return render_template(
                         'showBrands.html',
                         brands=brands,
-                        login_session=login_session)
+                        login_session=login_session
+                        )
 
 
 # Display all Models in brand with options to add Models
@@ -52,7 +53,8 @@ def showModels(brand_id):
                         brand=brand,
                         models=models,
                         login_session=login_session,
-                        brands=brands)
+                        brands=brands
+                        )
 
 
 # Display description + image of Model in a Brand with option to Edit or delete
@@ -68,7 +70,8 @@ def showModel(brand_id, model_id):
                         brand=brand,
                         model=model,
                         login_session=login_session,
-                        brands=brands)
+                        brands=brands
+                        )
 
 
 # Edit Model in Brand, first show form,
@@ -101,14 +104,16 @@ def editModel(brand_id, model_id):
                             brand_id=brand_id,
                             model_id=model_id,
                             brands=brands,
-                            login_session=login_session))
+                            login_session=login_session
+                            ))
     else:
         return render_template(
                             'editModel.html',
                             brand=brand,
                             editModel=editModel,
                             brands=brands,
-                            login_session=login_session)
+                            login_session=login_session
+                            )
 
 
 # Delete Model from Brand
@@ -135,7 +140,8 @@ def deleteModel(brand_id, model_id):
                             'showModels',
                             brand_id=brand_id,
                             brands=brands,
-                            login_session=login_session))
+                            login_session=login_session
+                            ))
     else:
         return render_template(
                                 'deleteModel.html',
@@ -143,7 +149,8 @@ def deleteModel(brand_id, model_id):
                                 model=model,
                                 brands=brands,
                                 brand_id=brand_id,
-                                login_session=login_session)
+                                login_session=login_session
+                                )
 
 
 # Add Model to Brand. First show the input form,
@@ -170,13 +177,15 @@ def addModel(brand_id):
                             'showModels',
                             brand_id=brand_id,
                             brands=brands,
-                            login_session=login_session))
+                            login_session=login_session
+                            ))
     else:
         return render_template(
                             'addModel.html',
                             brand=brand,
                             brands=brands,
-                            login_session=login_session)
+                            login_session=login_session
+                            )
 
 
 # Create randomly generated state token and store in login_session object,
@@ -285,7 +294,8 @@ def createUser(login_session):
     newUser = User(
                 name=login_session['username'],
                 email=login_session['email'],
-                picture=login_session['picture'])
+                picture=login_session['picture']
+                )
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
