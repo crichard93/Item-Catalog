@@ -1,5 +1,6 @@
 .img-fluid {
 	object-fit: contain;
+	margin: 0 0 20px 0px;
 }
 
 
@@ -20,7 +21,7 @@ p {
 
 
 h2 {
-	color: #FF652F;
+	color: #747474;
 }
 
 
